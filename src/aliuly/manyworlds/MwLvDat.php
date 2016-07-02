@@ -37,6 +37,7 @@ use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 use pocketmine\nbt\tag\Long;
 use pocketmine\nbt\tag\Compound;
+use pocketmine\math\Vector3;
 
 class MwLvDat extends BasicCli {
 	public function __construct($owner) {
@@ -59,7 +60,7 @@ class MwLvDat extends BasicCli {
 		}
 		$world = array_shift($args);
 		if(!$this->owner->autoLoad($c,$world)) {
-			$c->sendMessage(TextFormat::RED.mc::_("[MW] %1% is not loaded!",$worl));
+			$c->sendMessage(TextFormat::RED.mc::_("[MW] %1% is not loaded!",$world));
 			return true;
 		}
 		$level = $this->owner->getServer()->getLevelByName($world);

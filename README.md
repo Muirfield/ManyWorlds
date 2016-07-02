@@ -2,11 +2,11 @@
 
 # ManyWorlds
 
-* Summary: Full Suite for MultiWorld functionality
+* Summary: Manage Multiple Worlds
 * Dependency Plugins: n/a
-* PocketMine-MP version: 1.4 - API 1.10.0
+* PocketMine-MP version: 1.4 (API:1.10.0)
 * OptionalPlugins: n/a
-* Categories: World Editing and Management, Teleportation
+* Categories: Admin Tools, Teleportation
 * Plugin Access: Commands, Manages Worlds
 * WebSite: [github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/ManyWorlds)
 
@@ -166,12 +166,34 @@ for sample files.
 * A: You must be using PocketMine-MP v1.4.1.  Set the `generator` to
   `flat`.
 * Q: How do I load multiple worlds on start-up?
-  A: That functionality is provided by PocketMine-MP core by default.
+* A: That functionality is provided by PocketMine-MP core by default.
   In the `pocketmine.yml` file there is a `worlds` section where you
-  can define which worlds to load on start-up.
+  can define which worlds to load on start-up.  Examples:
+
+      [CODE]
+
+      # pocketmine.yml
+      worlds:
+         world1: []
+         world2: []
+      [/CODE]
+
+  This will automatically load worlds: "world1" and "world2" on startup.
 
 # Changes
 
+* 2.0.3: Bugfix update
+  * Fixes bug reported by @thebigsmileXD
+* 2.0.2: Bug fix
+  * Updated libcommon to 1.2.0dev1
+    * This fixes a bug reported by @SoyPro. (#23)
+    * Note this means that permissions defined in `plugin.yml` are applied
+      properly which means all **ManyWorlds** sub commands are **OP only**.
+* 2.0.1: Bug fix
+  * Changed command to manyworlds and mw is an alias.  This is to
+    prevent possible name collisions.
+  * Completed Spanish translation.
+  * Fixed crash (reported by @reyak)
 * 2.0.0: Modularization
   * Re-written for modularity
   * teleport manager API deprecated

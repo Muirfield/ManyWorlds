@@ -1,23 +1,37 @@
 <?php
 namespace aliuly\manyworlds\common;
+//= api-features
+//: - Config shortcuts and multi-module|feature management
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
-use pocketmine\event\Listener;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
+
 use aliuly\manyworlds\common\mc;
 use aliuly\manyworlds\common\BasicHelp;
+use aliuly\manyworlds\common\Session;
+use aliuly\manyworlds\common\SubCommandMap;
 
-use pocketmine\event\player\PlayerQuitEvent;
-
-abstract class BasicPlugin extends PluginBase implements Listener {
+/**
+ * Simple extension to the PocketMine PluginBase class
+ */
+abstract class BasicPlugin extends PluginBase {
 	protected $modules = [];
-	protected $scmdMap = [];
-	protected $state = [];
+	protected $scmdMap = null;
+	protected $session;
 
+	/**
+	 * Given some defaults, this will load optional features
+	 *
+	 * @param str $ns - namespace used to search for classes to load
+	 * @param array $mods - optional module definition
+	 * @param array $defaults - default options to use for config.yml
+	 * @param str $xhlp - optional help format.
+	 * @return array
+	 */
 	protected function modConfig($ns,$mods,$defaults,$xhlp="") {
 		if (!isset($defaults["features"])) $defaults["features"] = [];
 		foreach ($mods as $i => $j) {
@@ -33,6 +47,21 @@ abstract class BasicPlugin extends PluginBase implements Listener {
 			}
 			if (!$j) continue;
 			$class = $mods[$i][0];
+			if (is_array($class)) {
+				while (count($class) > 1) {
+					// All classes before the last one are dependencies...
+					$classname = $dep = array_shift($class);
+					if(strpos($classname,"\\") === false) $classname = $ns."\\".$classname;
+					if (isset($this->modules[$dep])) continue; // Dependancy already loaded
+					if(isset($cfg[strtolower($dep)])) {
+						$this->modules[$dep] = new $classname($this,$cfg[strtolower($dep)]);
+					} else {
+						$this->modules[$dep] = new $classname($this);
+					}
+				}
+				// The last class in the array implements the actual feature
+				$class = array_shift($class);
+			}
 			if(strpos($class,"\\") === false) $class = $ns."\\".$class;
 			if (isset($cfg[$i]))
 				$this->modules[$i] = new $class($this,$cfg[$i]);
@@ -44,17 +73,37 @@ abstract class BasicPlugin extends PluginBase implements Listener {
 			$this->getLogger()->info(mc::_("NO features enabled"));
 			return;
 		}
-		$this->state = [];
-		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		$this->session = null;
 		$this->getLogger()->info(mc::n(mc::_("Enabled one feature"),
-													 mc::_("Enable %1% features",$c),
+													 mc::_("Enabled %1% features",$c),
 													 $c));
-		if (count($this->scmdMap) && count($this->scmdMap["mgrs"])) {
+		if ($this->scmdMap !== null && $this->scmdMap->getCommandCount() > 0) {
 			$this->modules[] = new BasicHelp($this,$xhlp);
 		}
 		return $cfg;
 	}
-
+  /**
+	 * Get module
+	 * @param str $module - module to retrieve
+	 * @return mixed|null
+	 */
+	public function getModule($str) {
+		if (isset($this->modules[$str])) return $this->modules[$str];
+		return null;
+	}
+	/**
+	 * Get Modules array
+	 * @return array
+	 */
+	public function getModules() {
+		return $this->modules;
+	}
+	/**
+	 * Save a config section to the plugins' config.yml
+	 *
+	 * @param str $key - section to save
+	 * @param mixed $settings - settings to save
+	 */
 	public function cfgSave($key,$settings) {
 		$cfg=new Config($this->getDataFolder()."config.yml",Config::YAML);
 		$dat = $cfg->getAll();
@@ -62,90 +111,82 @@ abstract class BasicPlugin extends PluginBase implements Listener {
 		$cfg->setAll($dat);
 		$cfg->save();
 	}
-
-	protected function initSCmdMap() {
-		$this->scmdMap = [
-			"mgrs" => [],
-			"help" => [],
-			"usage" => [],
-			"alias" => [],
-			"permission" => [],
-		];
-	}
+	/**
+	 * Dispatch commands using sub command table
+	 */
 	protected function dispatchSCmd(CommandSender $sender,Command $cmd,array $args,$data=null) {
-		if (count($args) == 0) {
-			$sender->sendMessage(mc::_("No sub-command specified"));
+		if ($this->scmdMap === null) {
+			$sender->sendMessage(mc::_("No sub-commands available"));
 			return false;
 		}
-		$scmd = strtolower(array_shift($args));
-		if (isset($this->scmdMap["alias"][$scmd])) {
-			$scmd = $this->scmdMap["alias"][$scmd];
-		}
-		if (!isset($this->scmdMap["mgrs"][$scmd])) {
-			$sender->sendMessage(mc::_("Unknown sub-command %2% (try /%1% help)",$cmd->getName(),$scmd));
-			return false;
-		}
-		if (isset($this->scmdMapd["permission"][$scmd])) {
-			if (!$sender->hasPermission($this->scmdMapd["permission"][$scmd])) {
-				$sender->sendMessage(mc::_("You are not allowed to do this"));
-				return true;
-			}
-		}
-		$callback = $this->scmdMap["mgrs"][$scmd];
-		if ($callback($sender,$cmd,$scmd,$data,$args)) return true;
-		if (isset($this->scmdMap["mgrs"]["help"])) {
-			$callback = $this->scmdMap["mgrs"]["help"];
-			return $callback($sender,$cmd,$scmd,$data,["usage"]);
-		}
-		return false;
+		return $this->scmdMap->dispatchSCmd($sender,$cmd,$args,$data);
 	}
-
+	/** Look-up sub command map
+	 * @returns SubCommandMap
+	 */
 	public function getSCmdMap() {
 		return $this->scmdMap;
 	}
+	/**
+	 * Register a sub command
+	 * @param str $cmd - sub command
+	 * @param callable $callable - callable to execute
+	 * @param array $opts - additional options
+	 */
 	public function registerSCmd($cmd,$callable,$opts) {
-		$cmd = strtolower($cmd);
-		$this->scmdMap["mgrs"][$cmd] = $callable;
-
-		foreach (["help","usage","permission"] as $p) {
-			if(isset($opts[$p])) {
-				$this->scmdMap[$p][$cmd] = $opts[$p];
-			}
+		if ($this->scmdMap === null) {
+			$this->scmdMap = new SubCommandMap();
 		}
-		if (isset($opts["aliases"])) {
-			foreach ($opts["aliases"] as $alias) {
-				$this->scmdMap["alias"][$alias] = $cmd;
-			}
-		}
+		$this->scmdMap->registerSCmd($cmd,$callable,$opts);
 	}
-
-	public function onPlayerQuit(PlayerQuitEvent $ev) {
-		$n = strtolower($ev->getPlayer()->getName());
-		if (isset($this->state[$n])) unset($this->state[$n]);
-	}
-
+	/**
+	 * Get a player state for the desired module/$label.
+	 *
+	 * @param str $label - state variable to get
+	 * @param Player|str $player - Player instance or name
+	 * @param mixed $default - default value to return is no state found
+	 * @return mixed
+	 */
 	public function getState($label,$player,$default) {
-		if ($player instanceof CommandSender) $player = $player->getName();
-		$player = strtolower($player);
-		if (!isset($this->state[$player])) return $default;
-		if (!isset($this->state[$player][$label])) return $default;
-		return $this->state[$player][$label];
+		if ($this->session === null) return $default;
+		return $this->session->getState($label,$player,$default);
 	}
-
+	/**
+	 * Set a player related state
+	 *
+	 * @param str $label - state variable to set
+	 * @param Player|str $player - player instance or their name
+	 * @param mixed $val - value to set
+	 * @return mixed
+	 */
 	public function setState($label,$player,$val) {
-		if ($player instanceof CommandSender) $player = $player->getName();
-		$player = strtolower($player);
-		if (!isset($this->state[$player])) $this->state[$player] = [];
-		$this->state[$player][$label] = $val;
+		if ($this->session === null) $this->session = new Session($this);
+		return $this->session->setState($label,$player,$val);
 	}
-
+	/**
+	 * Clears a player related state
+	 *
+	 * @param str $label - state variable to clear
+	 * @param Player|str $player - intance of Player or their name
+	 */
 	public function unsetState($label,$player) {
-		if ($player instanceof CommandSender) $player = $player->getName();
-		$player = strtolower($player);
-		if (!isset($this->state[$player])) return;
-		if (!isset($this->state[$player][$label])) return;
-		unset($this->state[$player][$label]);
+		if ($this->session === null) return;
+		$this->session->unsetState($label,$player);
 	}
 
-
+	/**
+	 * Gets the contents of an embedded resource on the plugin file.
+	 *
+	 * @param string $filename
+	 * @return string|null
+	 */
+	public function getResourceContents($filename){
+		$fp = $this->getResource($filename);
+		if($fp === null){
+			return null;
+		}
+		$contents = stream_get_contents($fp);
+		fclose($fp);
+		return $contents;
+	}
 }
