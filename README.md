@@ -1,7 +1,8 @@
-ManyWorlds
-==========
+<img src="https://raw.githubusercontent.com/alejandroliu/pocketmine-plugins/master/Media/ManyWorlds-icon.png" style="width:64px;height:64px" width="64" height="64"/>
 
-* Summary: Basic commands for MultiWorld functionality
+# ManyWorlds
+
+* Summary: Full Suite for MultiWorld functionality
 * Dependency Plugins: n/a
 * PocketMine-MP version: 1.4 - API 1.10.0
 * OptionalPlugins: n/a
@@ -9,10 +10,20 @@ ManyWorlds
 * Plugin Access: Commands, Manages Worlds
 * WebSite: [github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/ManyWorlds)
 
-Overview
----------
+## Overview
 
-A very basic plugin implementing MultiWorld functionality
+**DO NOT POST QUESTION/BUG-REPORTS/REQUESTS IN THE REVIEWS**
+
+It is difficult to carry a conversation in the reviews.  If you have a
+question/bug-report/request please use the
+[Thread](http://forums.pocketmine.net/threads/manyworlds.7277/) for
+that.  You are more likely to get a response and help that way.
+
+Please go to
+[github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/ManyWorlds)
+for the most up-to-date documentation.
+
+Full feature set of commands to manage multiple worlds.
 
 Features:
 
@@ -20,62 +31,101 @@ Features:
 * load/unload
 * create
 * world info
+* edit level.dat
 
-Basic Usage:
+### Basic Usage
 
-* /mw tp *level* [player]
-* /mw create *level* [seed [flat|normal [preset]]]
-* /mw load *level*
-* /mw unload [-f] *level*
-* /mw ls [level]
-* /mw lvdat [level] [attr=value]
-* /mw fixname [level]
+* create : Creates a new world
+* default : Sets the default world
+* fixname : fixes name mismatches
+* generators : List available world generators
+* load : Loads a world
+* ls : Provide world information
+* lvdat : Show/Modify level.dat variables
+* tp : Teleport to another world
+* unload : Unloads world
 
-Documentation
--------------
+## Documentation
 
 This plugin is a world manager that allows you to generate and load
 worlds as well as teleport between worlds.
 
-The teleport itself has a number of workarounds to deal with
-Client-Server glitches.  Essentially, it works for me.
+### Command Reference
 
-### Commands:
+The following commands are available:
 
-Teleporting:
+* /mw **create** _&lt;world&gt;_ _[seed]_ _[generator]_ _[preset]_  
+  Creates a new world  
 
-* mw tp *level* [player]  
-  Teleports `player` to `level`.  If no `player` is specified, it
-  teleports the current user.
-* mw ls [level]  
-  If `level` is not specified, it will list all available worlds.  If
-  `level` is specified, it will provide details on that `level`.
+ Creates a world named _world_.  You can optionally specify a _seed_
+ as number, the generator (_flat_ or _normal_) and a _preset_ string.
 
-World management:
+* /mw **default** _&lt;world&gt;_  
+  Sets the default world  
 
-* mw create *level* [seed] [flat|normal] [preset]  
-  Creates a world named `level`.  You can optionally specify a `seed`
-  as number, the generator (`flat` or `normal`) and a `preset` string.
-* mw load *level*  
-  Loads `level` directly.  If you use `--all` for the `level` name, it
-  will load all worlds.
-* mw unload *level*  
-  Unloads `level`.
+  Teleports you to another world.  If _player_ is specified, that
+  player will be teleported.
+* /mw **fixname** _&lt;world&gt;_  
+  fixes name mismatches  
 
-Format hacking:
+  Fixes a world's **level.dat** file so that the name matches the
+  folder name.
+* /mw **generators**  
+  List available world generators  
 
-* mw fixname *level*  
-  Fixes `level.dat` files so that the name matches the folder name.
-* mw lvdat *attr=value* *attr=value*  
-  Change directly some `level.dat` values/attributes.  Supported
+  List registered world generators.
+* /mw **load** _&lt;world&gt;_  
+  Loads a world  
+
+  Loads _world_ directly.  Use _--all_ to load **all** worlds.
+
+* /mw **ls** _[world]_  
+  Provide world information  
+
+  If _world_ is not specified, it will list available worlds.
+  Otherwise, details for _world_ will be provided.
+* /mw **lvdat** _&lt;world&gt;_ _[attr=value]_  
+  Show/Modify level.dat variables  
+
+  Change directly some **level.dat** values/attributes.  Supported
   attributes:
-  * spawn=x,y,z : Sets spawn point
-  * seed=randomseed : seed used for terrain generation
-  * name=string : Level name
-  * generator=flat|normal : Terrain generator
-  * preset=string : Presets string.
+  - spawn=x,y,z : Sets spawn point
+  - seed=randomseed : seed used for terrain generation
+  - name=string : Level name
+  - generator=flat|normal : Terrain generator
+  - preset=string : Presets string.
 
-### Examples:
+* /mw **tp** _[player]_ _&lt;world&gt;_  
+  Teleport to another world  
+
+  Teleports you to another world.  If _player_ is specified, that
+  player will be teleported.
+* /mw **unload** _[-f]_  _&lt;world&gt;_  
+  Unloads world  
+
+  Unloads _world_.  Use _-f_ to force unloads.
+
+
+### Permission Nodes
+
+* mw.cmds : Allow all the ManyWorlds functionality
+* mw.cmd.tp : Allows users to travel to other worlds
+  (Defaults to Op)
+* mw.cmd.tp.others : Allows users to make others travel to other worlds
+  (Defaults to Op)
+* mw.cmd.ls : Allows users to list worlds
+  (Defaults to Op)
+* mw.cmd.world.create : Allows users to create worlds
+  (Defaults to Op)
+* mw.cmd.world.load : Allows users to load worlds
+  (Defaults to Op)
+* mw.cmd.lvdat : Manipulate level.dat
+  (Defaults to Op)
+* mw.cmd.default : Changes default world
+  (Defaults to Op)
+
+
+## Examples
 
 Create a new normal world:
 
@@ -91,39 +141,26 @@ Teleport to this newly created world:
 
 Teleport a player to another world:
 
-    /mw tp flatland joshua
+    /mw tp joshua flatland
 
-### Configuration
+## Translations
 
-In the plugin's config.yml file you can have:
+This plugin will follow the server language configuration.  The
+languages currently available are:
 
-	settings:
-	  broadcast-tp: true
+* English
+* Spanish
 
-* `broadcast-tp`: Controls broadcast message that somebody teleported.
+You can provide your own message file by creating a file called
+`messages.ini` in the pluginc config directory.  Check
+[github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/ManyWorlds/resources/messages/)
+for sample files.
 
-### API
+## Issues
 
-To use the teleport provided by ManyWorlds, you can use this code:
+* New world names can not contain spaces.
 
-	if (($mw = $this->getServer()->getPluginManager()->getPlugin("ManyWorlds")) != null) {
-	    $mw->mwtp($player,$pos);
-	} else {
-	    $player->teleport($pos);
-	}
-
-You need to do this in order for WorldProtect limits to work.
-
-### Permission Nodes:
-
-* mw.cmd.tp - Allows users to travel to other worlds
-* mw.cmd.tp.others - Allows users to make others travel to other worlds
-* mw.cmd.world.create - Allows users to create worlds
-* mw.cmd.world.load - Allows users to load worlds
-* mw.cmd.lvdat - Manipulate level data
-
-FAQ
----
+## FAQ
 
 * Q: How do I create a `FLAT` world?
 * A: You must be using PocketMine-MP v1.4.1.  Set the `generator` to
@@ -133,14 +170,15 @@ FAQ
   In the `pocketmine.yml` file there is a `worlds` section where you
   can define which worlds to load on start-up.
 
-Issues
-------
+# Changes
 
-* World names can not contain spaces.
-
-Changes
--------
-
+* 2.0.0: Modularization
+  * Re-written for modularity
+  * teleport manager API deprecated
+  * Added `default` command to change the default level.
+  * New `genlist` for list of generators
+  * tp command changed to more natural English.
+  * Translation: Spanish
 * 1.3.4: Updates for PM1.5
   * Removed CallbackTask deprecation warnings
 * 1.3.3: Updates for PM1.5
@@ -199,3 +237,4 @@ Copyright
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
