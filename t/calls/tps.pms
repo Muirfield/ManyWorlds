@@ -1,0 +1,21 @@
+@ $sp = new \specter\api\DummyPlayer('playertp')
+@ $op = new \specter\api\DummyPlayer('sysoptp')
+@ $sp->getPlayer()->setOp(FALSE)
+@ $op->getPlayer()->setOp(TRUE)
+
+mw create tst_tpw1 4 flat
+mw create tst_tpw2 4 flat
+mw create tst_tpw3 4 flat
+
+mw tp playertp tst_tpw1
+mw tp sysoptp tst_tpw1
+mw tp tst_tpw1
+
+@ $server->dispatchCommand( $op->getPlayer(),"mw tp tst_tpw2")
+@ $server->dispatchCommand( $op->getPlayer(),"mw tp playertp tst_tpw2")
+
+@ $server->dispatchCommand( $sp->getPlayer(),"mw tp tst_tpw3")
+@ $server->dispatchCommand( $sp->getPlayer(),"mw tp sysoptp tst_tpw3")
+
+@ $sp->close()
+@ $op->close()

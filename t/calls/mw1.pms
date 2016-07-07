@@ -1,0 +1,48 @@
+#
+# Test aliases
+#
+mw generators
+manyworlds genls
+mw gen
+#
+# test create world
+#
+mw create testworld1
+mw create testworld2 100
+mw create testworld3 4 flat
+mw create tst_hell1 940305 hell
+
+#
+# List worlds...
+#
+mw ls
+mw ls tst_hell1
+mw ls testworld3
+
+#
+# Change default
+#
+mw default tst_hell1
+mw ls
+mw default world
+mw ls
+
+#
+# Load unload
+#
+mw unload testworld3
+mw ls
+mw load testworld3
+mw ls
+
+#
+# Level data editing
+#
+mw lvdat testworld3
+mw unload testworld3
+mw lvdat testworld3 spawn=20,20,20 name=my_good_name seed=9849 generator=normal
+mw ls testworld3
+
+mw fixname testworld3
+mw ls testworld3
+

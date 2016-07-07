@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+. "$(dirname "$(readlink -f "$0")")/libcommon/utils/init.sh"
+. $utlib/pm.sh
+. $utlib/unitest.sh
+
+trap 'exit $retcode' EXIT
+
+[ ! -f plugin.yml ] && fatal "No plugin.yml"
+[ -f README.md ] && $gd3tool gen -w src
+
+if [ -d resource/messages ] ; then
+  $mcgen gen resources/messages src $([ -d libcommon/src ] && echo libcommon/src)
+  $mcgen enc resources/messages
+fi
+$mkver src
+
+phplint src || fatal "Failed lint"
+
+install_pocketmine
+testgroup="$(default_tests t "$@")"
+[ -z "$testgroup" ] && exit
+
+#
+# Lite version test...
+#
+rm -f $MPDIR/plugins/*.phar
+pm_plugins
+$mkplugin -o $MPDIR/plugins libcommon/
+$mkpp -o $MPDIR/plugins -L .
+runtests $testgroup
+
+rm -f $MPDIR/plugins/*.phar
+pm_plugins
+$mkplugin -o $MPDIR/plugins libcommon/
+$mkpp -o $MPDIR/plugins -F .   \
+    --ysed=s/^depend:.*// \
+    -l libcommon/src:mf/common=aliuly/mw/common
+runtests $testgroup
+
+show_results

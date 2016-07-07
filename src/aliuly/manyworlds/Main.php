@@ -1,104 +1,53 @@
 <?php
-/**
- **
- **/
 namespace aliuly\manyworlds;
 
-use pocketmine\command\CommandExecutor;
+use mf\common\ModularPlugin;
+use mf\common\HelpSubCmd;
+use mf\common\mc;
+use mf\common\Perms;
+
 use pocketmine\command\CommandSender;
-use pocketmine\command\Command;
-use pocketmine\level\Position;
 
-use pocketmine\utils\TextFormat;
+use aliuly\manyworlds\MwTp;
+use aliuly\manyworlds\MwLs;
+use aliuly\manyworlds\MwCreate;
+use aliuly\manyworlds\MwGenLst;
+use aliuly\manyworlds\MwLoader;
+use aliuly\manyworlds\MwLvDat;
+use aliuly\manyworlds\MwDefault;
 
-//use pocketmine\level\Level;
-//use pocketmine\event\level\LevelLoadEvent;
-//use pocketmine\event\level\LevelUnloadEvent;
-//use pocketmine\Player;
+class Main extends ModularPlugin {
+  public function onEnable() {
+    mc::init($this,$this->getFile());
 
-use aliuly\manyworlds\common\mc;
-use aliuly\manyworlds\common\MPMU;
-use aliuly\manyworlds\common\BasicPlugin;
-use aliuly\manyworlds\common\BasicHelp;
+    $this->addModule("teleport",new MwTp($this,[]));
+    $this->addModule("lister",new MwLs($this,[]));
+    $this->addModule("creator",new MwCreate($this,[]));
+    $this->addModule("genlister",new MwGenLst($this,[]));
+    $this->addModule("loader",new MwLoader($this,[]));
+    $this->addModule("unloader",new MwUnload($this,[]));
+    $this->addModule("default",new MwDefault($this,[]));
+    $this->addModule("lvdat",new MwLvDat($this,[]));
+    $this->addModule("lvdat",new MwFixName($this,[]));
+    $this->addModule("mwhelp",new HelpSubCmd($this,"manyworlds"));
+  }
 
-class Main extends BasicPlugin implements CommandExecutor {
-	public $canUnload = false;
-	private $tpMgr = null;
-
-	public function onEnable() {
-		// We don't really need this...
-		//if (!is_dir($this->getDataFolder())) mkdir($this->getDataFolder());
-		mc::plugin_init($this,$this->getFile());
-
-		if (MPMU::apiVersion("1.12.0")) {
-			$this->canUnload = true;
-			$this->tpMgr = null;
-		} else {
-			$this->canUnload = false;
-			$this->tpMgr = new TeleportManager($this);
-		}
-		$this->modules = [];
-		foreach ([
-			"MwTp",
-			"MwLs",
-			"MwCreate",
-			"MwGenLst",
-			"MwLoader",
-			"MwLvDat",
-			"MwDefault",
-		] as $mod) {
-			$mod = __NAMESPACE__."\\".$mod;
-			$this->modules[] = new $mod($this);
-		}
-		$this->modules[] = new BasicHelp($this);
-	}
-
-	public function autoLoad(CommandSender $c,$world) {
-		if ($this->getServer()->isLevelLoaded($world)) return true;
-		if($c !== null && !MPMU::access($c, "mw.cmd.world.load")) return false;
-		if(!$this->getServer()->isLevelGenerated($world)) {
-			if ($c !== null) {
-				$c->sendMessage(mc::_("[MW] No world with the name %1% exists!",
-											 $world));
-			}
-			return false;
-		}
-		$this->getServer()->loadLevel($world);
-		return $this->getServer()->isLevelLoaded($world);
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	//
-	// Command dispatcher
-	//
-	//////////////////////////////////////////////////////////////////////
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		if ($cmd->getName() != "manyworlds") return false;
-		return $this->dispatchSCmd($sender,$cmd,$args);
-	}
-	//
-	// Deprecated Public API
-	//
-	public function mwtp($pl,$pos) {
-		if ($this->tpMgr && ($pos instanceof Position)) {
-			// Using ManyWorlds for teleporting...
-			return $this->teleport($pl,$pos->getLevel()->getName(),
-										  new Vector3($pos->getX(),
-														  $pos->getY(),
-														  $pos->getZ()));
-		}
-		$pl->teleport($pos);
-		return true;
-	}
-	public function teleport($player,$world,$spawn=null) {
-		if ($this->tpMgr) {
-			return $this->tpMgr->teleport($player,$world,$spawn);
-		}
-		if (!$this->getServer()->isLevelLoaded($world)) return false;
-		$level = $this->owner->getServer()->getLevelByName($world);
-		if (!$level) return false;
-		// Try to find a reasonable spawn location
-		$location = $level->getSafeSpawn($spawn);
-		$player->teleport($location);
-	}
+  /**
+   * Autoload a world
+   *
+   * @param CommandSender $c - person attempting this operation
+   * @param str $world - world to load
+   * @return bool - TRUE on success, FALSE on ERROR
+   */
+  public function autoLoad(CommandSender $c,$world) {
+    if ($this->getServer()->isLevelLoaded($world)) return TRUE;
+    if($c !== NULL && !Perms::access($c, "mw.cmd.world.load")) return FALSE;
+    if(!$this->getServer()->isLevelGenerated($world)) {
+      if ($c !== NULL) $c->sendMessage(mc::_("[MW] No world with the name %1% exists!", $world));
+      return FALSE;
+    }
+    $this->getServer()->loadLevel($world);
+    return $this->getServer()->isLevelLoaded($world);
+  }
 }
+

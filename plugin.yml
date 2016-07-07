@@ -2,10 +2,12 @@ main: aliuly\manyworlds\Main
 api: 2.0.0
 load: POSTWORLD
 
+depend: [ libcommon ]
 name: ManyWorlds
 description: Manage Multiple Worlds
-version: 2.1.0
+version: 2.2.0dev1
 author: aliuly
+website: https://github.com/Muirfield/ManyWorlds
 
 commands:
   manyworlds:

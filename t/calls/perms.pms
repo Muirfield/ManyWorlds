@@ -1,0 +1,26 @@
+@ $sp = new \specter\api\DummyPlayer('player1')
+@ $op = new \specter\api\DummyPlayer('sysop1')
+
+mw create tst_pworld 4 flat
+
+@ $sp->getPlayer()->setOp(FALSE)
+@ $op->getPlayer()->setOp(TRUE)
+
+@ $i = 0
+@ foreach ([$sp,$op] as $pl):
+
+  @ ++$i;
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw genls")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw create tst_w$i 1 flat")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw lvdat tst_pworld")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw lvdat tst_pworld spawn=$i,$i,$i")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw unload tst_pworld")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw load tst_pworld")
+
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw default tst_pworld")
+  @ $server->dispatchCommand( $pl->getPlayer(),"mw default world")
+  
+@ endforeach
+
+@ $sp->close()
+@ $op->close()

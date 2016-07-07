@@ -1,0 +1,25 @@
+language: php
+php:
+- '7.0'
+script:
+- bash test
+
+# We don't really need sudo, the next
+# two lines enable Ubuntu 14 which is needed to run tests.
+sudo: required
+dist: trusty
+
+before_deploy:
+- bash libcommon/mkpp -o . . --ysed='s/^depend:.*//' -l libcommon/src:mf/common=aliuly/mw/common
+   
+deploy:
+  provider: releases
+  api_key:
+    secure: Tfx540S6ikBh1k0SylE5JrxUlDNiYLEOVYQseJvQf6GuGfUaXBqfBQlt5KTjgqpUWA4Bmb4W5le/aSdCqoRZhigSIUTNy+Y7ack2KpdOVYFIN8B9eWlwNPwzCwxBOCcbMxcpG0A98YdAOHEBr8bDTM0b9oXZE4OX/wFaMX4Ja8BehueGby+8W500tMcMiZHi6C7cfhBiJyhTX4FyPdvWeg9LsKrfG4+rkd0/2VxJ7+Fo74D7Ch7FB2zdkcZt18EqrOVLH71pJYHMzh6vSXdGLEbw0mNaRioLNdxnOXQY/r3DelHCB/nFoT/WPIJb9Vj1kVuW/7efZtgJOqixg6LYIsmLMP2aRmBKF6Ks6EVLJyjl7ZHRqZuUkukvDBcuq5QzuGLS1yH0HrgbiIRYfGK4LzgUR/YN+aw0BhqUwsqe4jOVviqfb3g7czuzKa5JmI/eDpGU7djhN91HOy9TOYCxGnI5nRCf1zxED88XCLcylD3uE6N35ukRv2iONbVwFfHxUPoX3bJGpQM06/sfZuuA++cvfIqbGHzHSYDrDTAM5NNoY/AdgSRAtx/3hksk3neBFpoeYVeR79eyZqnXCJZnCxK8sW0OPFD7XaTpt4F9NMiTIpIDlgKPO2VkDIM0Cq7FSiqEU926TCAVbBrsiHXrNETQ1fScSYa4zzVMxNbpBQE=
+  file: 
+   - "ManyWorlds_v*.phar"
+   - "ManyWorlds-lite_v*.phar"
+  file_glob: true
+  on:
+    tags: true
+    repo: Muirfield/ManyWorlds
