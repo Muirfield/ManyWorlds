@@ -210,10 +210,6 @@ for sample files.
 
 <!-- end-include -->
 
-## Issues
-
-* New world names can not contain spaces.
-
 ## FAQ
 
 * Q: How do I create a `FLAT` world?
@@ -251,6 +247,8 @@ for sample files.
 # Known Issues
 
 - In MwCreate, it can not test properly when a generator does not exist
+- New world names can not contain spaces.
+
 
 # Changes
 
