@@ -9,8 +9,8 @@ trap 'exit $retcode' EXIT
 [ ! -f plugin.yml ] && fatal "No plugin.yml"
 [ -f README.md ] && $gd3tool gen -w src
 
-if [ -d resource/messages ] ; then
-  $mcgen gen resources/messages src $([ -d libcommon/src ] && echo libcommon/src)
+if [ -d resources/messages ] ; then
+  $mcgen gen $([ -d libcommon/src ] && echo -Ilibcommon/src) resources/messages src
   $mcgen enc resources/messages
 fi
 $mkver src

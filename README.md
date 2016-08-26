@@ -16,12 +16,10 @@
 
 
 <!-- end-include -->
-<!-- meta: API = http://muirfield.github.io/libcommon/apidocs/index.html -->
 <!-- php: $v_forum_thread = "http://forums.pocketmine.net/threads/manyworlds.7277/"; -->
-<!-- php:$copyright="2016"; -->
+<!-- php: $copyright="2016"; -->
 
-<!-- template: old/prologue.md -->
-
+<!-- template: prologue.md -->
 **DO NOT POST QUESTIONS/BUG-REPORTS/REQUESTS IN THE REVIEWS**
 
 It is difficult to carry a conversation in the reviews.  If you
@@ -29,15 +27,31 @@ have a question/bug-report/request please use the
 [Thread](http://forums.pocketmine.net/threads/manyworlds.7277/) for
 that.  You are more likely to get a response and help that way.
 
-_NOTE:_
-
-This documentation was last updated for version **2.2.0dev1**.
+_NOTE:_ This documentation was last updated for version **2.2.0dev2**.
 
 Please go to
 [github](https://github.com/Muirfield/ManyWorlds)
 for the most up-to-date documentation.
 
-You can also download this plugin from this [page](https://github.com/Muirfield/pocketmine-plugins/releases/tag/ManyWorlds-2.2.0dev1).
+You can also download this plugin from this [page](https://github.com/Muirfield/ManyWorlds/releases).
+Usually there are two types of releases, a _normal_ release (no suffix) and a _lite_
+release with the suffix `-lite`.  The _lite_ release has a dependancy on 
+the [libcommon](https://github.com/Muirfield/libcommon/releases) plugin, where as
+the _normal_ release does not.  You only need to download **one**.
+
+
+When clonning this repository make sure you use the `--recursive` option:
+
+    git clone --recursive https://github.com/Muirfield/ManyWorlds.git
+    
+Otherwise you need to initialize sub-modules manually:
+
+    git clone https://github.com/Muirfield/ManyWorlds.git
+    cd ManyWorlds
+    git submodule update --init --recursive
+
+
+
 
 
 <!-- end-include -->
@@ -181,6 +195,7 @@ This plugin will honour the server language configuration.  The
 languages currently available are:
 
 * English
+* Dutch
 * Spanish
 
 
@@ -200,8 +215,7 @@ for sample files.
 ## FAQ
 
 * Q: How do I create a `FLAT` world?
-* A: You must be using PocketMine-MP v1.4.1.  Set the `generator` to
-  `flat`.
+* A: Set the `generator` to `flat`.
 * Q: How do I load multiple worlds on start-up?
 * A: That functionality is provided by PocketMine-MP core by default.
   In the `pocketmine.yml` file there is a `worlds` section where you
@@ -235,7 +249,6 @@ for sample files.
 # Known Issues
 
 - In MwCreate, it can not test properly when a generator does not exist
-- Permissions are still broken
 
 # Changes
 

@@ -5,7 +5,7 @@ load: POSTWORLD
 depend: [ libcommon ]
 name: ManyWorlds
 description: Manage Multiple Worlds
-version: 2.2.0dev1
+version: 2.2.0dev2
 author: aliuly
 website: https://github.com/Muirfield/ManyWorlds
 
