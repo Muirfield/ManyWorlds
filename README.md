@@ -3,6 +3,10 @@
 
 <!-- end-include -->
 <img id="ManyWorlds-icon.png" src="https://raw.githubusercontent.com/Muirfield/ManyWorlds/master/media/ManyWorlds-icon.png" style="width:64px;height:64px" width="64" height="64"/>
+<!-- meta: Categories = World Editing and Management, Admin Tools, Teleportation -->
+<!-- php: $v_forum_thread = "http://forums.pocketmine.net/threads/manyworlds.7277/"; -->
+<!-- php: $copyright="2016"; -->
+
 <!-- template: header.md -->
 
 # ManyWorlds
@@ -11,13 +15,11 @@
 - PocketMine-MP API version: 2.0.0
 - DependencyPlugins: libcommon
 - OptionalPlugins: 
-- Categories: N/A
+- Categories: World Editing and Management, Admin Tools, Teleportation 
 - WebSite: https://github.com/Muirfield/ManyWorlds
 
 
 <!-- end-include -->
-<!-- php: $v_forum_thread = "http://forums.pocketmine.net/threads/manyworlds.7277/"; -->
-<!-- php: $copyright="2016"; -->
 
 <!-- template: prologue.md -->
 **DO NOT POST QUESTIONS/BUG-REPORTS/REQUESTS IN THE REVIEWS**
