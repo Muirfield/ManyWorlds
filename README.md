@@ -20,6 +20,8 @@
 
 
 <!-- end-include -->
+<!-- php: $v_forum_thread = "http://forums.pocketmine.net/threads/manyworlds.7277/"; -->
+<!-- php: $copyright="2016"; -->
 
 <!-- template: prologue.md -->
 **DO NOT POST QUESTIONS/BUG-REPORTS/REQUESTS IN THE REVIEWS**
@@ -248,7 +250,6 @@ for sample files.
 
 - In MwCreate, it can not test properly when a generator does not exist
 - New world names can not contain spaces.
-
 
 # Changes
 
