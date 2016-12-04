@@ -89,7 +89,7 @@ class MwLvDat extends MwSubCmd {
 	  break;
 	case "name": // LevelName String
 	  if ($provider->getName() == $v) {
-	    $c->sendMessage(mc::_("Name unchanged"));
+	    $sender->sendMessage(mc::_("Name unchanged"));
 	    continue;
 	  }
 	  $changed = TRUE; $unload = TRUE;
