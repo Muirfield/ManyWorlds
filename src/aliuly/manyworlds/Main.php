@@ -22,9 +22,14 @@ use aliuly\manyworlds\common\BasicPlugin;
 use aliuly\manyworlds\common\BasicHelp;
 
 class Main extends BasicPlugin implements CommandExecutor {
+	/** @var bool */
 	public $canUnload = false;
+	/** @var TeleportManager */
 	private $tpMgr = null;
 
+	/**
+	 * @return void
+	 */
 	public function onEnable() {
 		// We don't really need this...
 		//if (!is_dir($this->getDataFolder())) mkdir($this->getDataFolder());
@@ -53,6 +58,12 @@ class Main extends BasicPlugin implements CommandExecutor {
 		$this->modules[] = new BasicHelp($this);
 	}
 
+	/**
+	 * @param CommandSender $c
+	 * @param string $world
+	 *
+	 * @return bool
+	 */
 	public function autoLoad(CommandSender $c,$world) {
 		if ($this->getServer()->isLevelLoaded($world)) return true;
 		if($c !== null && !MPMU::access($c, "mw.cmd.world.load")) return false;
@@ -72,6 +83,14 @@ class Main extends BasicPlugin implements CommandExecutor {
 	// Command dispatcher
 	//
 	//////////////////////////////////////////////////////////////////////
+	/**
+	 * @param CommandSender $sender
+	 * @param Command $cmd
+	 * @param string $label
+	 * @param string[] $args
+	 *
+	 * @return bool
+	 */
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
 		if ($cmd->getName() != "manyworlds") return false;
 		return $this->dispatchSCmd($sender,$cmd,$args);
@@ -79,6 +98,12 @@ class Main extends BasicPlugin implements CommandExecutor {
 	//
 	// Deprecated Public API
 	//
+	/**
+	 * @param Player $pl
+	 * @param Position $pos
+	 *
+	 * @return bool
+	 */
 	public function mwtp($pl,$pos) {
 		if ($this->tpMgr && ($pos instanceof Position)) {
 			// Using ManyWorlds for teleporting...
@@ -90,6 +115,13 @@ class Main extends BasicPlugin implements CommandExecutor {
 		$pl->teleport($pos);
 		return true;
 	}
+	/**
+	 * @param Player $player
+	 * @param string $world
+	 * @param Position $spawn
+	 *
+	 * @return bool|void
+	 */
 	public function teleport($player,$world,$spawn=null) {
 		if ($this->tpMgr) {
 			return $this->tpMgr->teleport($player,$world,$spawn);
